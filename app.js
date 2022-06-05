@@ -20,6 +20,20 @@ fastify.register(mySql, {
 
 const port = 3000;
 
+const productValidator = {
+    schema: {
+      body: {
+        type: 'object',
+        required: ['nome', 'preco', 'quantidade'],
+        properties: {
+          nome: { type: 'string' },
+          preco: { type: 'number' },
+          quantidade: { type: 'number' },
+        }
+      }
+    }
+  }
+
 const start = async () => {
     try {
         await fastify.listen(port);
@@ -39,7 +53,7 @@ fastify.get('/static/example', function (req, reply) {
     // serving path.join(__dirname, 'public', 'htmlExample.html') directly
 });
 
-fastify.post('/produto', async (req, reply) => {
+fastify.post('/produto', productValidator, async (req, reply) => {
     const connection = await fastify.mysql.getConnection();
     const result = await connection.query(
         'INSERT INTO produto (nome, preco, quantidade) VALUES (?,?,?)',
@@ -62,7 +76,7 @@ fastify.get('/produto/:id', async (req, reply) => {
     return rows[0];
 });
 
-fastify.put('/produto/:id', async (req, reply) => {
+fastify.put('/produto/:id', productValidator, async (req, reply) => {
     const connection = await fastify.mysql.getConnection();
     const result = await connection.query(
         'UPDATE produto SET nome = ?, preco = ?, quantidade = ? WHERE id = ?',

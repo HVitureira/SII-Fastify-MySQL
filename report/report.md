@@ -20,6 +20,7 @@
 		* 6.3.2. [Read Produto](#ReadProduto)
 		* 6.3.3. [Update Produto](#UpdateProduto)
 		* 6.3.4. [Delete Produto](#DeleteProduto)
+	* 6.4. [Validar Pedidos](#ValidarPedidos)
 * 7. [Ficheiro app.js](#Ficheiroapp.js)
 
 <!-- vscode-markdown-toc-config
@@ -294,6 +295,40 @@ Após testarmos o pedido, podemos ver o corpo devolvido com o resultado da query
 ![Resposta do endpoint para atualizar um produto](assets/delete-request.PNG)
 
 
+###  6.4. <a name='ValidarPedidos'></a>Validar Pedidos
+Um dos pontos fulcrais do Fastify é a validação dos requests, que é realizada com JSON Schema. Podemos fazer um schema para validar uma dada rota, validando o seu corpo, headers, etc. Podemos então usar um dado schema como o segundo parâmetro de uma rota, fazendo com que esse schema valide os pedidos que acionem esta rota. Nesta caso podemos utilizar um schema para validar as rotas de criar produto e atualizar produto.
+
+```javascript
+const productValidator = {
+    schema: {
+      body: {
+        type: 'object',
+        required: ['nome', 'preco', 'quantidade'],
+        properties: {
+          nome: { type: 'string' },
+          preco: { type: 'number' },
+          quantidade: { type: 'number' },
+        }
+      }
+    }
+  }
+
+fastify.post('/produto', productValidator, async (req, reply) => {
+
+fastify.put('/produto/:id', productValidator, async (req, reply) => {
+```
+
+Este esqueça valida que que todas as propriedades 'nome', 'preco', 'quantidade' estão presentes (required). Também valida o tipo de dados de cada propriedade, string para o nome do produto, número para o preço e quantidade.
+
+Ao fazer-se um pedido com dados inválidos, a nossa API responde de forma adequada.
+
+![Resposta do endpoint para atualizar um produto validado](assets/post-request-validate.PNG)
+
+O mesmo acontece quando dados obrigatórios não estão presentes.
+
+![Resposta do endpoint para atualizar um produto validado](assets/post-request-validate2.PNG)
+
+
 ##  7. <a name='Ficheiroapp.js'></a>Ficheiro app.js
 No final devemos ter um ficheiro app.js com o seguinte código:
 
@@ -320,6 +355,20 @@ fastify.register(mySql, {
 
 const port = 3000;
 
+const productValidator = {
+    schema: {
+      body: {
+        type: 'object',
+        required: ['nome', 'preco', 'quantidade'],
+        properties: {
+          nome: { type: 'string' },
+          preco: { type: 'number' },
+          quantidade: { type: 'number' },
+        }
+      }
+    }
+  }
+
 const start = async () => {
     try {
         await fastify.listen(port);
@@ -339,7 +388,7 @@ fastify.get('/static/example', function (req, reply) {
     // serving path.join(__dirname, 'public', 'htmlExample.html') directly
 });
 
-fastify.post('/produto', async (req, reply) => {
+fastify.post('/produto', productValidator, async (req, reply) => {
     const connection = await fastify.mysql.getConnection();
     const result = await connection.query(
         'INSERT INTO produto (nome, preco, quantidade) VALUES (?,?,?)',
@@ -362,7 +411,7 @@ fastify.get('/produto/:id', async (req, reply) => {
     return rows[0];
 });
 
-fastify.put('/produto/:id', async (req, reply) => {
+fastify.put('/produto/:id', productValidator, async (req, reply) => {
     const connection = await fastify.mysql.getConnection();
     const result = await connection.query(
         'UPDATE produto SET nome = ?, preco = ?, quantidade = ? WHERE id = ?',
