@@ -22,6 +22,7 @@
 		* 6.3.4. [Delete Produto](#DeleteProduto)
 	* 6.4. [Validar Pedidos](#ValidarPedidos)
 * 7. [Ficheiro app.js](#Ficheiroapp.js)
+* 8. [Repositório](#Repositrio)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -437,3 +438,6 @@ fastify.delete('/produto/:id', async (req, reply) => {
 
 start();
 ```
+
+##  8. <a name='Repositrio'></a>Repositório
+O repositório da aplicação desenvolvida encontra-se em [https://github.com/HVitureira/SII-Fastify-MySQL](https://github.com/HVitureira/SII-Fastify-MySQL).
