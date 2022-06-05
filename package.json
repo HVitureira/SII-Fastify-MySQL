@@ -5,6 +5,7 @@
   "main": "app.js",
   "dependencies": {
     "@fastify/helmet": "^8.1.0",
+    "@fastify/mysql": "^3.0.0",
     "@fastify/static": "^5.0.2",
     "abstract-logging": "^2.0.1",
     "ajv": "^6.12.6",
