@@ -1,6 +1,16 @@
 
 const fastify = require('fastify')({
     logger: true
+});
+const path = require('path');
+const helmet = require('@fastify/helmet');
+const fastifyStatic = require('@fastify/static');
+
+fastify.register(helmet)
+
+fastify.register(fastifyStatic, {
+    root: path.join(__dirname, 'public'),
+    prefix: '/public/', // optional: default '/'
 })
 
 const port = 3000;
@@ -19,4 +29,10 @@ fastify.get('/', async (request, reply) => {
     return { hello: 'world' };
 })
 
-start()
+fastify.get('/static/example', function (req, reply) {
+    return reply.sendFile('htmlExample.html');
+    // serving path.join(__dirname, 'public', 'htmlExample.html') directly
+})
+
+
+start();
